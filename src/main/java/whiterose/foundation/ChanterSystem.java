@@ -1,4 +1,4 @@
-package whiterose.beenbt;
+package whiterose.foundation;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;

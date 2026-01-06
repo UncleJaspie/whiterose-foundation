@@ -1,4 +1,4 @@
-package whiterose.beenbt;
+package whiterose.foundation;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 

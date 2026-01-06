@@ -19,7 +19,7 @@ sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
 version = ""
-group= "whiterose.beenbt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group= "whiterose.foundation" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "AnalyzingPowers"
 
 minecraft {

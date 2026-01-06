@@ -1,4 +1,4 @@
-package whiterose.beenbt;
+package whiterose.foundation;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
