@@ -1,0 +1,16 @@
+[
+{
+  "modid": "Analyzing Powers",
+  "name": "Forestry Alyzers as Tooltips",
+  "description": "*alyzer but as a GL11 tooltip without needing to use the item, speeds up the analyzing process by 420.69ms.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Whiterose"],
+  "credits": "The GTNH guys for making the game so fucking hard",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
