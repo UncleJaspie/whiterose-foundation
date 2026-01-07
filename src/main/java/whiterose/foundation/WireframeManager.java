@@ -1,5 +1,6 @@
 package whiterose.foundation;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
@@ -22,7 +23,7 @@ import java.awt.*;
 public class WireframeManager {
 
     // Key to open the new GUI
-    public static KeyBinding configKey = new KeyBinding("key.beenbtviewer.config", Keyboard.KEY_K, "key.categories.beenbtviewer");
+    public static KeyBinding configKey = new KeyBinding("Wireframe Config", Keyboard.KEY_K, "Whiterose Foundation");
 
     // Filter Settings
     private static boolean showPlayers = false;
@@ -32,7 +33,7 @@ public class WireframeManager {
 
     public static void init() {
         // Register key and listeners similarly to your Inspector
-        cpw.mods.fml.client.registry.ClientRegistry.registerKeyBinding(configKey);
+        ClientRegistry.registerKeyBinding(configKey);
         WireframeManager instance = new WireframeManager();
         FMLCommonHandler.instance().bus().register(instance);
         MinecraftForge.EVENT_BUS.register(instance);

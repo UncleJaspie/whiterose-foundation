@@ -1,0 +1,216 @@
+package whiterose.foundation.deus.modules;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import whiterose.foundation.deus.api.config.Cfg;
+import whiterose.foundation.deus.api.gui.ElementAligment;
+import whiterose.foundation.deus.api.gui.WidgetMessage;
+import whiterose.foundation.deus.api.gui.WidgetMode;
+import whiterose.foundation.deus.api.module.Category;
+import whiterose.foundation.deus.api.module.CheatModule;
+import whiterose.foundation.deus.api.module.PerformMode;
+import whiterose.foundation.deus.gui.click.elements.Button;
+import whiterose.foundation.deus.gui.click.elements.GuiWidget;
+import whiterose.foundation.deus.gui.click.elements.Panel;
+import whiterose.foundation.deus.render.Colors;
+import whiterose.foundation.deus.render.GuiScaler;
+import whiterose.foundation.deus.utils.TickHelper;
+import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
+
+public class Widgets extends CheatModule {
+    
+    private Map<CheatModule, GuiWidget> keyabled, modulesInfo;
+    @Cfg("showKeyabled") private boolean showKeyabled;
+    @Cfg("showWidget") private boolean showWidget;
+    @Cfg("showInfo") private boolean showInfo;
+    private List<GuiWidget> infoWidgets;
+    private int infoWidgetsDelay;
+    
+    public Widgets() {
+        super("Widgets", Category.MISC, PerformMode.ENABLED_ON_START);
+        modulesInfo = new HashMap<CheatModule, GuiWidget>();
+        infoWidgets = new CopyOnWriteArrayList<GuiWidget>();
+        keyabled = new HashMap<CheatModule, GuiWidget>();
+        infoWidgetsDelay = TickHelper.FOUR_SEC;
+        showKeyabled = true;
+        showWidget = true;
+        showInfo = true;
+        cfgState = true;
+    }
+    
+    @Override public void onPostInit() {
+        keyabledMessage(moduleHandler().DeusGUI());
+        moduleHandler().categoryedModules().filter(CheatModule::isWidgetable).forEach(this::keyabledMessage);
+    }
+    
+    public void widgetMessage(WidgetMessage mess) {
+        if (showWidget) {
+            infoWidgets.add(0, new GuiWidget(mess.getMessage(), mess.getMode(), ElementAligment.LEFT, Colors.TRANSPARENT_DARKEST, infoWidgetsDelay));
+            updateWidgetPoses();
+        }
+    }
+    
+    public void infoMessage(WidgetMessage mess) {
+        if (mess.hasModule() && mess.getModule().isWidgetable()) {
+            modulesInfo.put(mess.getModule(), new GuiWidget(mess.getMessage(), mess.getMode(), ElementAligment.LEFT, Colors.TRANSPARENT_DARKEST, 0));
+            updateInfoPoses();
+        }
+    }
+    
+    public void hideInfoMessage(CheatModule m) {
+        if (modulesInfo.containsKey(m)) {
+            modulesInfo.remove(m);
+            updateInfoPoses();
+        }
+    }
+    
+    private void keyabledMessage(CheatModule m) {
+        if (m.isWidgetable()) {
+            String out = moduleHandler().isEnabled(m) || m.hasKeyBind() ? m.getName() + (m.hasKeyBind() ? "-" + m.getKeyName() : "") : null;
+            int height = 0;
+            if (out != null) {
+                keyabled.put(m, new GuiWidget(out, m.getMode() == PerformMode.SINGLE ? WidgetMode.INFO : moduleHandler().isEnabled(m) ? WidgetMode.SUCCESS : WidgetMode.FAIL, ElementAligment.LEFT, Colors.TRANSPARENT_DARK, 0));
+            } else {
+                if (keyabled.containsKey(m)) {
+                    keyabled.remove(m);
+                } else {
+                    return;
+                }
+            }
+            keyabled = sorted(keyabled);
+            for (GuiWidget w : keyabled.values()) {
+                w.setY(height);
+                height += w.getHeight(); 
+            }
+        }
+    }
+    
+    private void updateInfoPoses() {
+        if (GuiScaler.isGuiCreated()) {
+            modulesInfo = sorted(modulesInfo);
+            int height = 0;
+            for (GuiWidget w : modulesInfo.values()) {
+                height += w.getHeight();
+                w.setPos(GuiScaler.scaledScreenWidth() - w.getWidth(), GuiScaler.scaledScreenHeight() - height);
+            }
+        }
+    }
+    
+    private void updateWidgetPoses() {
+        if (GuiScaler.isGuiCreated()) {
+            infoWidgets.forEach(w -> {
+                w.setY(GuiScaler.scaledScreenHeight() - w.getHeight() * (infoWidgets.indexOf(w) + 1));
+            });
+        }
+    }
+    
+    private LinkedHashMap sorted(Map <CheatModule, GuiWidget> map) {
+        return map.entrySet().stream()
+        .sorted((e1, e2) -> Integer.compare(e2.getValue().getWidth(), e1.getValue().getWidth()))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+    }
+    
+    @Override public boolean isWidgetable() {
+        return false;
+    }
+    
+    @SubscribeEvent public void guiInit(InitGuiEvent.Pre e) {
+        onEnabled();
+    }
+    
+    @Override public void onDisabled() {
+        infoWidgets.clear();
+    }
+    
+    @Override public void onEnabled() {
+        onDisabled();
+        updateWidgetPoses();
+        updateInfoPoses();
+    }
+    
+    @Override public void onDrawGuiLast() {
+        if (showWidget) {
+            Iterator<GuiWidget> iterator = infoWidgets.iterator();
+            while (iterator.hasNext()) {
+                iterator.next().draw();
+            }
+        }
+    }
+    
+    @Override public void onDrawGuiOverlay() {
+        if (showInfo) {
+            Iterator<GuiWidget> iterator = modulesInfo.values().iterator();
+            while (iterator.hasNext()) {
+                iterator.next().draw();
+            }
+        }
+        if (showKeyabled) {
+            Iterator<GuiWidget> iterator = keyabled.values().iterator();
+            while (iterator.hasNext()) {
+                iterator.next().draw();
+            }
+        }
+    }
+    
+    @Override public void onTick(boolean inGame) {
+        infoWidgets.removeIf(w -> -- w.delay <= 0);
+    }
+    
+    @Override public void onModuleBinded(CheatModule m) {
+        keyabledMessage(m);
+    }
+    
+    @Override public void onModuleEnabled(CheatModule m) {
+        keyabledMessage(m);
+    }
+    
+    @Override public void onModuleUnBinded(CheatModule m) {
+        keyabledMessage(m);
+    }
+    
+    @Override public void onModuleDisabled(CheatModule m) {
+        hideInfoMessage(m);
+        keyabledMessage(m);
+    }
+    
+    @Override public String moduleDesc() {
+         return lang.get("Display setted information widgets");
+    }
+    
+    @Override public Panel settingPanel() {
+        return new Panel(
+            new Button("Keyabled", showKeyabled) {
+                @Override public void onLeftClick() {
+                    buttonValue(showKeyabled = !showKeyabled);
+                }
+                @Override public String elementDesc() {
+                    return lang.get("Active and binded modules");
+                }
+            },
+            new Button("Messages", showWidget) {
+                @Override public void onLeftClick() {
+                    buttonValue(showWidget = !showWidget);
+                }
+                @Override public String elementDesc() {
+                    return lang.get("Brief widget messages (bottom left)");
+                }
+            },
+            new Button("InfoPanels", showInfo) {
+                @Override public void onLeftClick() {
+                    buttonValue(showInfo = !showInfo);
+                }
+                @Override public String elementDesc() {
+                    return lang.get("Info panels (bottom right)");
+                }
+            }
+        );
+    }
+
+}

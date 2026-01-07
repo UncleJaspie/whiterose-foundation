@@ -30,7 +30,7 @@ import java.util.List;
 
 public class PlayerInspector {
 
-    public static KeyBinding inspectorKey = new KeyBinding("key.beenbtviewer.inspect", Keyboard.KEY_X, "key.categories.beenbtviewer");
+    public static KeyBinding inspectorKey = new KeyBinding("Inspect Players", Keyboard.KEY_X, "Whiterose Foundation");
 
     // Tracking for the wireframe feature
     private static final Set<Integer> highlightedEntities = new HashSet<>();

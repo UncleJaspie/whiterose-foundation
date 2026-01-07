@@ -47,19 +47,20 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod(modid = HudRenderHandler.MODID, name = "Forestry Genetics HUD", version = "7.6", dependencies = "required-after:Forestry", useMetadata = true)
+@Mod(modid = HudRenderHandler.MODID, name = "Whiterose Foundation", version = "6.7", dependencies = "required-after:Forestry", useMetadata = true)
 public class HudRenderHandler {
-    public static final String MODID = "beenbtviewer";
+    public static final String MODID = "whiterose_foundation";
     public static Logger logger = FMLLog.getLogger();
     public static KeyBinding keyOverlay;
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        keyOverlay = new KeyBinding("key.beenbtviewer.overlay", Keyboard.KEY_LMENU, "key.categories.beenbtviewer");
+        keyOverlay = new KeyBinding("Beealyzer Overlay", Keyboard.KEY_LMENU, "Whiterose Foundation");
         ClientRegistry.registerKeyBinding(keyOverlay);
         PlayerInspector.init();
         PacketScriptTool.init();
         WireframeManager.init();
+        NetherScope.init();
         MinecraftForge.EVENT_BUS.register(new HudRenderHandler.ClientEvents());
     }
 

@@ -46,7 +46,7 @@ public class SaplingConverter {
     @SideOnly(Side.CLIENT)
     private static void setupClient() {
         // Using LMnu (Left Alt) to trigger the conversion
-        keyConvert = new KeyBinding("key.beenbtviewer.convert_sapling", Keyboard.KEY_LMENU, "key.categories.beenbtviewer");
+        keyConvert = new KeyBinding("Convert sapling", Keyboard.KEY_LMENU, "Whiterose Foundation");
         cpw.mods.fml.client.registry.ClientRegistry.registerKeyBinding(keyConvert);
 
         // Register this class to the FML bus for key input events
